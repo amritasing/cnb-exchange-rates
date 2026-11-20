@@ -149,3 +149,18 @@ Czech National Bank, central bank exchange rate fixing. Published daily on
 working days, no API key required.
 
 https://www.cnb.cz/en/financial-markets/foreign-exchange-market/central-bank-exchange-rate-fixing/central-bank-exchange-rate-fixing/
+
+
+## Automation (n8n)
+
+The pipeline runs automatically every working day at 15:00 Prague time through a local n8n workflow (`automation/n8n_daily_cnb.json`).
+
+- **Schedule Trigger:** cron `0 15 * * 1-5`, timezone Europe/Prague
+- **Execute Command:** runs `python -m src.pipeline`
+- **Error branch:** when the pipeline fails, it exits with a non-zero code. n8n sends this to a Send Email node, which emails the error message as an alert.
+
+I tested the alert by breaking the module name on purpose and checking that the email arrived.
+
+**Limitations:** n8n runs locally, so the schedule only fires while n8n is running. The Execute Command node is disabled by default in n8n 2.x and must be enabled with `NODES_EXCLUDE=[]`. Czech public holidays may trigger a false alert until holiday handling is added.
+
+![n8n workflow](automation/n8n_workflow.png)

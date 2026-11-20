@@ -1,0 +1,107 @@
+{
+  "name": "CNB daily pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 15 * * 1-5"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "79ccbfef-879a-487d-ba63-1335a3b896af",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "command": "cd /d D:\\cnb-exchange-rates && .venv\\Scripts\\python.exe -m src.pipeline"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "2ee1040a-6215-4cd9-8331-c1e1cb6cb586",
+      "name": "Execute Command",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "fromEmail": "mritaing@gmail.com",
+        "toEmail": "mritaing@gmail.com",
+        "subject": "CNB Pipeline Failed",
+        "emailFormat": "text",
+        "text": "=The CNB exchange rate pipeline failed. Details: {{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        96
+      ],
+      "id": "7743d76b-8f63-4ba6-8979-06b79f7e7cc1",
+      "name": "Send an Email",
+      "webhookId": "6cf14f45-f418-417a-879b-f22db0c69a7e",
+      "credentials": {
+        "smtp": {
+          "id": "rfTN2NbiBpdNLNaS",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send an Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Europe/Prague",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "90d50e70-0fb2-49b7-9987-e96e3ac75577",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0a9739fadbca170947138f358363d3f129e843fee018712022626886e24721a8"
+  },
+  "nodeGroups": [],
+  "id": "8yDCazC6Rc0beBCl",
+  "tags": []
+}
